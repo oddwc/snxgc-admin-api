@@ -68,8 +68,6 @@ return [
     'system/rechargeStatistics' => 'system/rechargeStatistics', // 统计
 
 
-
-
     /**
      * 装饰分类
      */
@@ -81,6 +79,15 @@ return [
     'cate/del' => 'cate/del',//分类删除
     'cate/changeStatus' => 'cate/changeStatus',//更改状态
     'cate/changeLevel'=>'cate/changeLevel', //更改优先级
+
+    /**
+     * 子组件优先级
+     */
+    'level' => 'level/level',//列表
+    'level/add' => 'level/add',//添加
+    'level/edit' => 'level/edit',//编辑
+    'level/del' => 'level/del',//删除
+    'level/getLevelList' => 'level/getLevelList',//分类列表
 
 
     /**
@@ -153,9 +160,6 @@ return [
     'orders' => 'orders/orders', //列表
     'orders/search' => 'orders/search', //搜索
     'orders/export' => 'orders/export', //导出
-//    'background/edit' => 'background/edit', //编辑
-//    'background/del' => 'background/del', //删除
-//    'background/changeStatus'=>'background/changeStatus', //更改状态
     'orders/allRechargeConfig'=>'orders/allRechargeConfig', //所有充值配置列表
 
 

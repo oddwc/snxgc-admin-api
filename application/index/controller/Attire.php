@@ -32,7 +32,7 @@ class Attire extends Base
                 $list[$key]['default_attire'] = false;
             }
             $attire_attribute = Db::name('attire_attribute')->where('attire_id', $val['id'])->count();
-            $list[$key]['hasChildren'] = $attire_attribute > 0 ? '是' : '否';
+            $list[$key]['hasChildren'] = $attire_attribute > 0 ? true : false;
         }
         apiReturnList(200,'获取成功',$page,$size,$total,$list);
     }
@@ -170,7 +170,7 @@ class Attire extends Base
                 $list[$key]['default_attire'] = false;
             }
             $attire_attribute = Db::name('attire_attribute')->where('attire_id', $val['id'])->count();
-            $list[$key]['hasChildren'] = $attire_attribute > 0 ? '是' : '否';
+            $list[$key]['hasChildren'] = $attire_attribute > 0 ? true : false;
         }
         apiReturnList(200,'获取成功',$page,$size,$total,$list);
     }
@@ -178,7 +178,7 @@ class Attire extends Base
     //获取装饰分类
     public function getAttireCate()
     {
-        $list = Db::name('attire_cate')->where('pid',1)->where('id','>',2)->field('id,pid,name as label')->select();
+        $list = Db::name('attire_cate')->where('pid',1)->where('id','>',2)->where('status',1)->field('id,pid,name as label')->select();
         apiReturn(200,'获取成功',$list);
     }
 
@@ -195,16 +195,20 @@ class Attire extends Base
 
         if(empty($params['title'])) { apiReturn(202,'请填写标题'); }
         if(empty($params['thumb'])) { apiReturn(202,'请上传缩略图'); }
-        if(empty($params['image'])) { apiReturn(202,'请上传图片'); }
+
         $params['is_suit'] = 0;
         $params['create_time'] = now();
         try{
             $insertId = Db::name('attire')->insertGetId($params);
             //同时移动文件到指定目录
             $update['thumb'] = move_file($params['thumb'],'/attire/'.$insertId);
-            $update['image'] = move_file($params['image'],'/attire/'.$insertId);
+            if(!empty($params['image'])){
+                $update['image'] = move_file($params['image'],'/attire/'.$insertId);
+            }
+
             Db::name('attire')->where('id',$insertId)->update($update);
-            if($params['pid'] > 0){
+
+            if($params['pid'] > 0){ //如果是套装，
                 Db::name('attire')->where('id', $params['pid'])->setInc('cost', $params['cost']);
             }
             apiReturn(200,'添加成功');
