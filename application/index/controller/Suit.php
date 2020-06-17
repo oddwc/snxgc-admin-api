@@ -15,7 +15,7 @@ class Suit extends Base
         $page = input('page')?:1;
         $size = input('size')?:10;
 
-        $field = 'id,pid,title,thumb,type,cost,listorder,status,create_time';
+        $field = 'id,pid,title,thumb,image,type,cost,listorder,status,create_time';
         $total =Db::name('attire')->where('is_suit',1)->count();
         $list= Db::name('attire')->where('is_suit',1)->field($field)->order('id desc')->page($page,$size)->select();
 
@@ -105,15 +105,17 @@ class Suit extends Base
         $params = $this->request->post();
         
         if(empty($params['title'])) { apiReturn(202,'请填写标题'); }
-        if(empty($params['thumb'])) { apiReturn(202,'请上传套装缩略图'); }
+        if(empty($params['thumb'])) { apiReturn(202,'请上传格子图'); }
+        if(empty($params['image'])) { apiReturn(202,'请上传选中图'); }
         $params['cate_id'] = 2;
         $params['is_suit'] = 1;
         $params['create_time'] = now();
         try{
             $insertId = Db::name('attire')->insertGetId($params);
             //同时移动文件到指定目录
-            $newpath = move_file($params['thumb'],'/attire/'.$insertId);
-            Db::name('attire')->where('id',$insertId)->setField('thumb',$newpath);
+            $update['thumb'] = move_file($params['thumb'],'/suit/'.$insertId);
+            $update['image'] = move_file($params['image'],'/suit/'.$insertId);
+            Db::name('attire')->where('id',$insertId)->update($update);
         }catch(\Exception $e){
             apiReturn(202,$e->getMessage());
         }
@@ -126,11 +128,20 @@ class Suit extends Base
         if(empty($params['title'])) { apiReturn(202,'请填写标题'); }
 
         if(empty($params['thumb'])) {
-            apiReturn(202,'请上传套装缩略图');
+            apiReturn(202,'请上传格子图');
         }else{
             $thumb = Db::name('attire')->where('id',$params['id'])->value('thumb');
             if($params['thumb'] == $thumb){
                 unset($params['thumb']);
+            }
+        }
+
+        if(empty($params['image'])) {
+            apiReturn(202,'请上传选中图');
+        }else{
+            $image = Db::name('attire')->where('id',$params['id'])->value('image');
+            if($params['image'] == $image){
+                unset($params['image']);
             }
         }
 
@@ -139,8 +150,13 @@ class Suit extends Base
 
             if(isset($params['thumb'])){
                 //更新并同时移动文件到指定目录
-                $newpath = move_file($params['thumb'],'/attire/'.$params['id']);
+                $newpath = move_file($params['thumb'],'/suit/'.$params['id']);
                 $params['thumb'] = $newpath;
+            }
+
+            if(isset($params['image'])){
+                //更新并同时移动文件到指定目录
+                $params['image'] = move_file($params['image'],'/suit/'.$params['id']);
             }
 
             Db::name('attire')->where('id',$params['id'])->update($params);
@@ -152,18 +168,27 @@ class Suit extends Base
     //删除分类（带附件）
     public function del(){
         $id = $this->request->delete('id');
-        $file= Db::name('attire')->where('id',$id)->value('thumb');
+        $file= Db::name('attire')->where('id',$id)->field('thumb,image')->find();
         try{
             //删除分类
             Db::name('attire')->where('id',$id)->delete();
             //附件不为空则删除
-            if(!empty($file)){
+            if(!empty($file['thumb'])){
                 //文件是否存在
-                $absfile = upload_url().$file;
+                $absfile = upload_url().$file['thumb'];
                 if(file_exists($absfile)){
                     unlink($absfile);
                 }else{
-                    apiReturn(202,'文件不存在，无法删除');
+                    apiReturn(200,'文件不存在，无法删除相应文件');
+                }
+            }
+            if(!empty($file['image'])){
+                //文件是否存在
+                $absfile = upload_url().$file['image'];
+                if(file_exists($absfile)){
+                    unlink($absfile);
+                }else{
+                    apiReturn(200,'文件不存在，无法删除相应文件');
                 }
             }
 

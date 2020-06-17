@@ -21,6 +21,7 @@ class Base extends Controller
         if(!in_array($this->request->path(),$this->noNeedToken)){
             $this->token = self::check_token();
             $this->auth = self::getAuth($this->token);
+            $this->actionLog();
         }
 
 
@@ -58,6 +59,25 @@ class Base extends Controller
     //空操作
     public function _empty(){
         return $this->error('空操作，返回上次访问页面中...');
+    }
+
+    public function actionLog()
+    {
+        $request = $this->request;
+
+        $logs['ip'] = get_client_ip();
+        $logs['method'] = $request->method();
+        $logs['module'] = $request->module();
+        $logs['controller'] = $request->controller();
+        $logs['action'] = $request->action();
+        $logs['params'] = serialize($request->param());
+        $logs['req_time'] = $request->server('REQUEST_TIME');
+
+        try{
+            Db::name('logs')->insert($logs);
+        }catch (\Exception $e){
+            apiReturn(10001,'操作日志写入异常: '.$e->getMessage());
+        }
     }
 
 }

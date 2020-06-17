@@ -204,5 +204,34 @@ class Auth extends Base
 
     }
 
+    public function logs()
+    {
+
+        $page = input('page');
+        $size = input('size');
+
+        $total =Db::name('logs')->count();
+
+        $logs = Db::name('logs')->page($page,$size)->select();
+        foreach ($logs as $k=>$v){
+           switch ($v['method']){
+               case 'GET':
+                   $logs[$k]['desc'] = '查看、获取列表';
+                   break;
+               case 'POST':
+                   $logs[$k]['desc'] = '新增内容';
+                   break;
+               case 'PUT':
+                   $logs[$k]['desc'] = '修改内容';
+                   break;
+               case 'DELETE':
+                   $logs[$k]['desc'] = '删除内容';
+                   break;
+           }
+        }
+
+        apiReturnList(200,'获取成功',$page,$size,$total,$logs);
+    }
+
 }
 

@@ -173,6 +173,13 @@ return [
     'users/feedback' => 'users/feedback', //意见反馈
     'users/feedback/del' => 'users/feedbackDel', //删除意见反馈
 
+    /**
+     * 操作日志
+     */
+    'logs' => 'logs/logs',//列表
+    'logs/del' => 'logs/del',//删除
+
+
 
 
 ];

@@ -1,11 +1,12 @@
 <?php
 namespace app\index\controller;
 
+use app\common\controller\Base;
 use think\Db;
 use think\facade\Request;
 
 
-class System
+class System extends Base
 {
     public function systemInfo(){
         $version = Db::query('SELECT VERSION() AS ver');
@@ -52,7 +53,7 @@ class System
     }
 
     public function editConfig(){
-        $params = Request::put();
+        $params = $this->request->put();
 
         try{
             if(file_exists(upload_url().$params['logo'])){
@@ -80,7 +81,7 @@ class System
 
     public function editPay()
     {
-        $params = Request::put();
+        $params = $this->request->put();
         try{
             Db::name('config')->where('config_type','pay_config')->setField('config_content',json_encode($params,JSON_UNESCAPED_SLASHES));
             apiReturn(200,'编辑成功');
@@ -102,7 +103,7 @@ class System
 
     public function rechargeAdd()
     {
-        $params = Request::post();
+        $params = $this->request->post();
         if(empty($params['image'])){ apiReturn(202,'请上传图片'); }
 
         try{

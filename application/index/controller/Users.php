@@ -89,7 +89,7 @@ class Users extends Base
         $id = $this->request->put('id');
 
         try {
-            $defualt_attire = Db::name('default_attire')->where('status', 1)->column('id');
+            $defualt_attire = Db::name('default_attire')->where('status', 1)->column('attire_id');
             $defualt_attire = implode(',', $defualt_attire);
             Db::name('users_make_up')->where('uid', $id)->setField('attires', $defualt_attire);
             apiReturn(200,'清除装扮成功');
