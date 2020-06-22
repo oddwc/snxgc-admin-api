@@ -233,7 +233,7 @@ class Attire extends Base
             }
         }
         if(empty($params['image'])) {
-            apiReturn(202,'请上传图片');
+            unset($params['image']);
         }else{
             $image = Db::name('attire')->where('id',$params['id'])->value('image');
             if($params['image'] == $image){
@@ -242,11 +242,11 @@ class Attire extends Base
         }
 
         try{
-            if(isset($params['thumb'])){
+            if(isset($params['thumb']) && !empty($params['thumb'])){
                 //更新并同时移动文件到指定目录
                 $params['thumb'] = move_file($params['thumb'],'/attire/'.$params['id']);;
             }
-            if(isset($params['image'])){
+            if(isset($params['image'])  && !empty($params['image'])){
                 //更新并同时移动文件到指定目录
                 $params['image'] = move_file($params['image'],'/attire/'.$params['id']);;
             }

@@ -8,7 +8,7 @@ use think\Db;
 
 class Base extends Controller
 {
-    protected $noNeedToken = ['login','logout','createVerify'];
+    protected $noNeedToken = ['login','logout','createVerify','system/config'];
 
     protected $auth = [];
 
