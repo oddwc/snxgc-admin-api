@@ -167,6 +167,8 @@ return [
     'users' => 'users/index', //users列表
     'users/search' => 'users/search', //搜索
     'users/clearAttires' => 'users/clearAttires', //清除用户装扮为默认
+    'users/clearBuy' => 'users/clearBuy', //清除用户购买记录
+    'users/edit' => 'users/edit', //编辑
 
 
 

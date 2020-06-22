@@ -37,22 +37,17 @@ class Users extends Base
 
 
     public function edit(){
-        if($this->request->isPost()){
-            $params = $this->request->post();
-            if(empty($params['title'])) { apiReturn(202,'标题不能为空'); }
-            if(empty($params['image'])) { apiReturn(202,'图片不能为空'); }
-            if(empty($params['url'])) { apiReturn(202,'跳转地址不能为空'); }
-            $params['image'] = substr($params['image'],strlen($this->web_config['upload_url']));
 
-            $res = Db::name('users')->update($params);
-            if ($res){
-                apiReturn(200,'编辑成功');
-            }else{
-                apiReturn(204,'编辑失败');
-            }
-        }else{
-            apiReturn(405,'非法请求');
+        $params = $this->request->put();
+
+        try{
+            Db::name('users_wallet')->where('uid',$params['id'])->update(['coin'=>$params['coin'],'diamond'=>$params['diamond']]);
+            apiReturn(200,'编辑成功');
+        }catch (\Exception $e){
+            apiReturn(202,'编辑失败'.$e->getMessage());
         }
+
+
     }
 
 
@@ -123,6 +118,23 @@ class Users extends Base
             apiReturn(202,$e->getMessage());
         }
     }
+
+    public function clearBuy()
+    {
+        $id = $this->request->delete('id');
+
+        try{
+            $res = Db::name('purchase')->where('uid',$id)->delete();
+            if ($res){
+                apiReturn(200,'清除成功');
+            }else{
+                apiReturn(204,'清除失败');
+            }
+        }catch(\Exception $e){
+            apiReturn(202,$e->getMessage());
+        }
+    }
+
 
 
 
